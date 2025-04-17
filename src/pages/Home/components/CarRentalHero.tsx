@@ -23,7 +23,7 @@ const HeroContent: React.FC = () => {
 
     return (
       <div className="flex z-10 flex-col gap-12 items-start py-8 pr-8 pl-0 mt-12 ml-40 bg-black bg-opacity-10 h-[445px] w-[528px] max-md:p-4 max-md:w-[90%] max-sm:p-2 max-sm:w-full">
-        <div className="text-5xl font-bold text-white max-sm:text-3xl">
+        <div className="text-5xl font-[700] text-white max-sm:text-3xl">
           {contentData.map((item, index) => (
             <React.Fragment key={index}>
               <span>{item.text}</span>
