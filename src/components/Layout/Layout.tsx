@@ -10,7 +10,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <div className="min-h-screen flex flex-col">
       <TopBar />
-      <main className="flex-1 p-4 bg-gray-50">{children}</main>
+      <main className="flex-1">{children}</main>
     </div>
   );
 };

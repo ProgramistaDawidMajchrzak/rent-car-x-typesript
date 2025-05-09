@@ -1,7 +1,7 @@
 import React from 'react';
 import {CarRentalHero} from './components/CarRentalHero';
-import { Navigation } from '../../components/Navigation/Navigation';
 import { CarCard } from '../../components/Cars/CarCard';
+import Layout from '../../components/Layout/Layout';
 
 export const HomePage: React.FC = () => {
    const carData = {
@@ -18,9 +18,9 @@ export const HomePage: React.FC = () => {
     }
   };
   return (
-    <>
+    <Layout>
       <CarRentalHero />
-      <div className='flex flex-4 flex-wrap m-32 gap-4'>
+      <div className='flex flex-4 flex-wrap lg:m-32 gap-4'>
         <CarCard {...carData} />
         <CarCard {...carData} />
         <CarCard {...carData} />
@@ -42,6 +42,6 @@ export const HomePage: React.FC = () => {
         <CarCard {...carData} />
         <CarCard {...carData} />
       </div>
-    </>
+    </Layout>
   );
 };
