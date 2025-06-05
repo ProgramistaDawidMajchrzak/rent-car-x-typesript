@@ -1,4 +1,3 @@
-// src/components/Layout/TopBar.tsx
 import React from "react";
 import { Image } from "../Image";
 import { Button } from "../Form/Button";

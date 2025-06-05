@@ -4,6 +4,8 @@ import { CarListPage } from "../pages/CarListPage/CarListPage";
 import { SignInPage } from "../pages/AuthPage/SignIn";
 import { LogInPage } from "../pages/AuthPage/LogInPage";
 import { Board } from "../pages/AdminBoard/Board";
+import { AdminUsers } from "../pages/AdminBoard/AdminUsers";
+import { AdminCars } from "../pages/AdminBoard/AdminCars";
 // import { CarsPage } from "../pages/Cars/CarsPage";
 // import { NotFoundPage } from "../pages/NotFound/NotFoundPage";
 
@@ -27,6 +29,14 @@ const router = createBrowserRouter([
   {
     path: "/admin",
     element: <Board />,
+  },
+  {
+    path: "/admin/users",
+    element: <AdminUsers />,
+  },
+  {
+    path: "/admin/cars",
+    element: <AdminCars />,
   },
 //   {
 //     path: "*",

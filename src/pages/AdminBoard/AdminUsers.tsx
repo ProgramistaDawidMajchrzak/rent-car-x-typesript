@@ -1,6 +1,6 @@
 import React from 'react';
 import AdminLayout from '../../components/Layout/AdminLayout';
-export const Board: React.FC = () => {
+export const AdminUsers: React.FC = () => {
     return (
         <AdminLayout>
             AdminBoard

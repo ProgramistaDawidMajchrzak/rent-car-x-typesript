@@ -1,9 +1,9 @@
 import React from 'react';
 import AdminLayout from '../../components/Layout/AdminLayout';
-export const Board: React.FC = () => {
+export const AdminCars: React.FC = () => {
     return (
         <AdminLayout>
-            AdminBoard
+            AdminCars
         </AdminLayout>
     );
 };
