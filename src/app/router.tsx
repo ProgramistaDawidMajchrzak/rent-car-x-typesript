@@ -3,6 +3,7 @@ import { HomePage } from "../pages/Home/HomePage";
 import { CarListPage } from "../pages/CarListPage/CarListPage";
 import { SignInPage } from "../pages/AuthPage/SignIn";
 import { LogInPage } from "../pages/AuthPage/LogInPage";
+import { Board } from "../pages/AdminBoard/Board";
 // import { CarsPage } from "../pages/Cars/CarsPage";
 // import { NotFoundPage } from "../pages/NotFound/NotFoundPage";
 
@@ -22,6 +23,10 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: <LogInPage />,
+  },
+  {
+    path: "/admin",
+    element: <Board />,
   },
 //   {
 //     path: "*",

@@ -1,12 +1,14 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { register as registerUser } from '../../services/auth.service';
 import { Image } from '../../components/Image';
 import { getRoleFromToken } from '../../utils/jwt.utils';
+import { useNavigate } from 'react-router-dom';
+import { CustomModal } from '../../components/modal';
 
-// Walidacja z hasłem zgodnie z wymaganiami
+
 const schema = yup.object().shape({
   username: yup.string().required('Username is required'),
   email: yup.string().email('Invalid email').required('Email is required'),
@@ -34,28 +36,28 @@ export const SignInPage: React.FC = () => {
     resolver: yupResolver(schema),
   });
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [confirmUrl, setConfirmUrl] = useState('');
+
+  const navigate = useNavigate();
+
   const onSubmit = async (data: FormData) => {
     try {
         const { username, email, password } = data;
-        
-        
         const response = await registerUser({ username, email, password });
         const token = response.jwtToken;
+        const confirmLink = response.confirmationLink;
         localStorage.setItem("token", token);
         
         const role = getRoleFromToken(token);
-
-        console.log("---------ROLE------------")
-        console.log(role)
-
-        if (role === "Admin") {
-            // navigate("/admin/dashboard");
-        } else {
-            // navigate("/user/home");
+        
+        if(role){
+          localStorage.setItem("role", role);
         }
 
-        
-      
+        setConfirmUrl(confirmLink);
+        setIsModalOpen(true);
+
         alert('Registration successful!');
     } catch (err) {
         alert('Registration failed. Check console for details.');
@@ -147,6 +149,11 @@ export const SignInPage: React.FC = () => {
           </div>
         </div>
       </div>
+      <CustomModal
+        isOpen={isModalOpen}
+        onRequestClose={() => setIsModalOpen(false)}
+        confirmUrl={confirmUrl}
+      />
     </form>
   );
 };
