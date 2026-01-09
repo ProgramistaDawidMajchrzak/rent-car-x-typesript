@@ -3,19 +3,22 @@ import Sidebar from "./Sidebar";
 import AdminHeader from "./AdminHeader";
 
 type LayoutProps = {
+  title: string;
   children: ReactNode;
 };
 
-const AdminLayout: React.FC<LayoutProps> = ({ children }) => {
+const AdminLayout: React.FC<LayoutProps> = ({ title, children }) => {
   return (
-    <main className="overflow-hidden relative w-full h-screen bg-white max-md:h-screen">
+    <main className="overflow-hidden relative w-full h-screen bg-white">
       <Sidebar />
       <div>
-        <AdminHeader />
-        {children}
+        <AdminHeader title={title} />
+        <div className="pt-20 pl-24"> {/* padding żeby treść nie wchodziła na header */}
+          {children}
+        </div>
       </div>
     </main>
   );
-}
+};
 
 export default AdminLayout;

@@ -1,0 +1,15 @@
+{
+  "brands": [
+    { "name": "Audi", "models": ["A3", "A4", "Q5"] },
+    { "name": "BMW", "models": ["3 Series", "5 Series", "X5"] },
+    { "name": "Volkswagen", "models": ["Golf", "Passat", "Tiguan"] },
+    { "name": "Skoda", "models": ["Octavia", "Superb", "Kodiaq"] },
+    { "name": "Toyota", "models": ["Corolla", "Yaris", "RAV4"] },
+    { "name": "Mazda", "models": ["Mazda 3", "CX-5", "MX-5"] },
+    { "name": "Volvo", "models": ["XC60", "XC90", "S60"] },
+    { "name": "Mercedes-Benz", "models": ["C-Class", "E-Class", "GLC"] },
+    { "name": "Ford", "models": ["Focus", "Fiesta", "Kuga"] },
+    { "name": "Hyundai", "models": ["i30", "Tucson", "Kona"] }
+  ],
+  "fuelTypes": ["Petrol", "Diesel", "Hybrid", "Electric"]
+}

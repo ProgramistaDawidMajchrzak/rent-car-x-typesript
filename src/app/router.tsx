@@ -6,8 +6,12 @@ import { LogInPage } from "../pages/AuthPage/LogInPage";
 import { Board } from "../pages/AdminBoard/Board";
 import { AdminUsers } from "../pages/AdminBoard/AdminUsers";
 import { AdminCars } from "../pages/AdminBoard/AdminCars";
-// import { CarsPage } from "../pages/Cars/CarsPage";
-// import { NotFoundPage } from "../pages/NotFound/NotFoundPage";
+import { EmailConfirmationPage } from "../pages/AuthPage/ConfirmationPage";
+import { ReservationPage } from "../pages/Reservation/ReservationPage";
+import { MyAccountPage } from "../pages/MyAccount/MyAccountPage";
+import { ForgotPasswordPage } from "../pages/AuthPage/ForgotPasswordPage";
+import { ResetPasswordPage } from "../pages/AuthPage/ResetPasswordPage";
+
 
 const router = createBrowserRouter([
   {
@@ -23,8 +27,24 @@ const router = createBrowserRouter([
     element: <SignInPage />,
   },
   {
+    path: "/confirm-email",
+    element: <EmailConfirmationPage />,
+  },
+  {
     path: "/login",
     element: <LogInPage />,
+  },
+  {
+    path: "/forgot-password",
+    element: <ForgotPasswordPage />,
+  },
+  {
+    path: "/reset-password",
+    element: <ResetPasswordPage />,
+  },
+  {
+    path: "/my-account",
+    element: <MyAccountPage />,
   },
   {
     path: "/admin",
@@ -38,10 +58,12 @@ const router = createBrowserRouter([
     path: "/admin/cars",
     element: <AdminCars />,
   },
-//   {
-//     path: "*",
-//     element: <NotFoundPage />,
-//   },
+
+  // ⭐ NOWA ŚCIEŻKA
+  {
+    path: "/reservation/:carId",
+    element: <ReservationPage />,
+  },
 ]);
 
 export const AppRouter = () => <RouterProvider router={router} />;

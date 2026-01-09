@@ -1,3 +1,6 @@
+
+import {jwtDecode} from "jwt-decode";
+
 export function getRoleFromToken(token: string | null): string | null {
   if (!token) return null;
 
@@ -18,3 +21,22 @@ export function getRoleFromToken(token: string | null): string | null {
     return null;
   }
 }
+
+type DecodedToken = {
+  unique_name?: string;
+  name?: string;
+  [key: string]: any;
+};
+
+export const getUsernameFromToken = (): string | null => {
+  const token = localStorage.getItem("token");
+  if (!token) return null;
+
+  try {
+    const decoded = jwtDecode<DecodedToken>(token);
+    return decoded.unique_name || decoded.name || null;
+  } catch {
+    return null;
+  }
+};
+

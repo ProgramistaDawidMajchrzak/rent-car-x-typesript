@@ -1,14 +1,22 @@
 import axios from 'axios';
 
 const request = axios.create({
-    baseURL: 'https://localhost:7100/api',
+    baseURL: 'http://localhost:5113/api/v1',
+    headers: {
+        "Content-Type": "application/json",
+    }
 });
 
 request.interceptors.request.use((req) => {
-    if (localStorage.getItem('token')) {
-        req.headers.Authorization = `Bearer ${localStorage.getItem('accessToken')}`;
-    }
+    const token = localStorage.getItem("token");
+    console.log("Axios → token wysyłany:", token);
+
+    if (token) req.headers.Authorization = `Bearer ${token}`;
+
+    console.log("Final headers:", req.headers);
+
     return req;
 });
+
 
 export default request;

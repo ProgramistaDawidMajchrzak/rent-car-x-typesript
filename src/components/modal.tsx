@@ -1,7 +1,5 @@
-import React, {useState} from 'react';
+import React from 'react';
 import ReactModal from 'react-modal';
-import { useNavigate } from 'react-router-dom';
-import { confirmEmail } from '../services/auth.service';
 
 const customStyles = {
   content: {
@@ -20,20 +18,7 @@ type CustomModalProps = {
   confirmUrl: string;
 };
 
-export const CustomModal: React.FC<CustomModalProps> = ({ isOpen, onRequestClose, confirmUrl }) => {
-  const navigate = useNavigate();
-  const [confirmMessage, setConfirmMessage] = useState(null);
-
-    const onSubmit = async () => {
-        try {
-            const response = await confirmEmail(confirmUrl);
-            setConfirmMessage(response)
-        } catch (err) {
-            alert('Confirmation failed. Check console for details.');
-            console.error(err);
-        }
-    }
-    
+export const CustomModal: React.FC<CustomModalProps> = ({ isOpen, onRequestClose }) => {
 
   return (
     <ReactModal
@@ -43,35 +28,24 @@ export const CustomModal: React.FC<CustomModalProps> = ({ isOpen, onRequestClose
       contentLabel="Confirmation Modal"
       ariaHideApp={false}
     >
-        <button
-            onClick={onRequestClose}
-            className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded shadow"
-        >
-        Close
-        </button>
+      <div className="flex flex-col items-center gap-4 p-4">
 
-        <div className="my-5 text-sm text-gray-700 font-medium">
-            Click below to confirm your email:
-        </div>
+        <h2 className="text-lg font-bold">Verify your email</h2>
 
-        <button
-            onClick={onSubmit}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded shadow mb-4"
-        >
-        Confirm Email
-        </button>
-
-        {confirmMessage && (
-            <p className="text-green-500 text-xs font-medium">{confirmMessage}</p>
-        )}
+        <p className="text-sm text-gray-700 text-center max-w-[260px]">
+          Your account has been created successfully.
+          <br />
+          <strong>Please check your email inbox</strong> and click the activation link to confirm your account.
+        </p>
 
         <button
-            onClick={() => navigate('/login')}
-            className="bg-gray-800 hover:bg-gray-900 text-white font-semibold py-2 px-4 rounded shadow mt-5"
+          onClick={onRequestClose}
+          className="bg-slate-900 hover:bg-slate-700 text-white font-semibold py-2 px-4 rounded shadow"
         >
-        Go to Login Page
+          Close
         </button>
 
+      </div>
     </ReactModal>
   );
 };

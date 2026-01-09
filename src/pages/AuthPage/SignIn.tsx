@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { register as registerUser } from '../../services/auth.service';
+import { register as registerUser } from '../../services/auth.service.js';
 import { Image } from '../../components/Image';
 import { getRoleFromToken } from '../../utils/jwt.utils';
 import { useNavigate } from 'react-router-dom';
@@ -38,32 +38,40 @@ export const SignInPage: React.FC = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [confirmUrl, setConfirmUrl] = useState('');
+  const [serverError, setServerError] = useState("");
 
   const navigate = useNavigate();
 
   const onSubmit = async (data: FormData) => {
+    setServerError("");
+
     try {
         const { username, email, password } = data;
         const response = await registerUser({ username, email, password });
+
         const token = response.jwtToken;
         const confirmLink = response.confirmationLink;
+
         localStorage.setItem("token", token);
-        
+
         const role = getRoleFromToken(token);
-        
-        if(role){
-          localStorage.setItem("role", role);
-        }
+        if (role) localStorage.setItem("role", role);
 
         setConfirmUrl(confirmLink);
         setIsModalOpen(true);
 
-        alert('Registration successful!');
     } catch (err) {
-        alert('Registration failed. Check console for details.');
-        console.error(err);
+      let message = "Registration failed.";
+
+      if (err instanceof Error) {
+        message = err.message;
+      }
+
+      setServerError(message);
+      console.error(err);
     }
   };
+
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -93,6 +101,11 @@ export const SignInPage: React.FC = () => {
                   className="px-2 w-full text-xs rounded-lg border border-slate-900 border-opacity-50 h-[30px] text-zinc-400"
                 />
                 <p className="text-red-500 text-xs">{errors.email?.message}</p>
+                {serverError && (
+                    <p className="text-red-500 text-xs">
+                        {serverError}
+                    </p>
+                )}
               </div>
 
               {/* Password */}
@@ -107,7 +120,7 @@ export const SignInPage: React.FC = () => {
                 <p className="text-red-500 text-xs">{errors.password?.message}</p>
               </div>
 
-              {/* Confirm Password (tylko lokalna walidacja) */}
+              {/* Confirm Password */}
               <div className="flex flex-col gap-1">
                 <label className="text-xs font-bold">Confirm Password</label>
                 <input
@@ -117,10 +130,6 @@ export const SignInPage: React.FC = () => {
                   className="px-2 w-full text-xs rounded-lg border border-slate-900 border-opacity-50 h-[30px] text-zinc-400"
                 />
                 <p className="text-red-500 text-xs">{errors.confirmPassword?.message}</p>
-
-                <div className="mt-1.5 text-xs font-bold cursor-pointer">
-                  I forgot my password
-                </div>
               </div>
             </div>
 
