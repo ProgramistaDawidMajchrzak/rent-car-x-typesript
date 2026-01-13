@@ -1,0 +1,32 @@
+{
+  "files": {
+    "main.css": "/static/css/main.e05431b0.css",
+    "main.js": "/static/js/main.96294722.js",
+    "static/media/hero_image.png": "/static/media/hero_image.e132281b4785c4228685.png",
+    "static/media/Montserrat-Italic.ttf": "/static/media/Montserrat-Italic.c12cc8e898b7a5d2d4c1.ttf",
+    "static/media/Montserrat-Bold.ttf": "/static/media/Montserrat-Bold.3530bfc1b50b41bdc29d.ttf",
+    "static/media/Montserrat-SemiBold.ttf": "/static/media/Montserrat-SemiBold.38e62f01be69b2e02e29.ttf",
+    "static/media/Montserrat-Regular.ttf": "/static/media/Montserrat-Regular.cfbf0da06d33097e6d0a.ttf",
+    "static/media/Montserrat-Medium.ttf": "/static/media/Montserrat-Medium.d3f3d769c2fc1af5c0b4.ttf",
+    "static/media/LogoAuth.png": "/static/media/LogoAuth.ee895e65b1ab768f4577.png",
+    "static/media/sample_car.png": "/static/media/sample_car.0662a4ca31f4a6bd39a6.png",
+    "static/media/stripe.svg": "/static/media/stripe.7a4904e174c6ff125660d9de654367c7.svg",
+    "static/media/cars-admin.svg": "/static/media/cars-admin.1e30731b2539333c766fcfa20a7b4c21.svg",
+    "static/media/export.svg": "/static/media/export.71a3f64ecb1dc033c0694742dfc16b2b.svg",
+    "static/media/reservations.svg": "/static/media/reservations.b9d05186584638606828d3d9122d190c.svg",
+    "static/media/logout.svg": "/static/media/logout.45d08c05738eccd2069f12b806a41571.svg",
+    "static/media/people.svg": "/static/media/people.fa8209f203f5552143fb56e00dd23eff.svg",
+    "static/media/logo-admin.svg": "/static/media/logo-admin.df4cd0673f38466c3046ca0d4c3c3c9d.svg",
+    "static/media/gas.svg": "/static/media/gas.6d65894248fabd1d707c82b8c65e43b9.svg",
+    "static/media/gear_box.svg": "/static/media/gear_box.987b3023d13fb3a4e5e9eecc3cc2edc8.svg",
+    "index.html": "/index.html",
+    "static/media/users-nav.svg": "/static/media/users-nav.6c3aa13b3868154ee95f08b17d331f4a.svg",
+    "static/media/heart.svg": "/static/media/heart.65cb77615769e7bfdb5a9b1233b02e2e.svg",
+    "main.e05431b0.css.map": "/static/css/main.e05431b0.css.map",
+    "main.96294722.js.map": "/static/js/main.96294722.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.e05431b0.css",
+    "static/js/main.96294722.js"
+  ]
+}
