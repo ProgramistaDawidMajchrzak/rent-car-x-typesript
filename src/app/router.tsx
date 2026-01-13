@@ -11,6 +11,10 @@ import { ReservationPage } from "../pages/Reservation/ReservationPage";
 import { MyAccountPage } from "../pages/MyAccount/MyAccountPage";
 import { ForgotPasswordPage } from "../pages/AuthPage/ForgotPasswordPage";
 import { ResetPasswordPage } from "../pages/AuthPage/ResetPasswordPage";
+import { AdminReservations } from "../pages/AdminBoard/AdminReservations";
+import { AdminExportsPage } from "../pages/AdminBoard/ExportsPage";
+import { AdminStripePage } from "../pages/AdminBoard/AdminStripePage";
+import { PaymentSuccessPage } from "../pages/Payments/PaymentSuccessPage";
 
 
 const router = createBrowserRouter([
@@ -58,8 +62,22 @@ const router = createBrowserRouter([
     path: "/admin/cars",
     element: <AdminCars />,
   },
-
-  // ⭐ NOWA ŚCIEŻKA
+  {
+    path: "/admin/reservations",
+    element: <AdminReservations />,
+  },
+  {
+    path: "/admin/exports",
+    element: <AdminExportsPage />,
+  },
+  {
+    path: "/admin/stripe",
+    element: <AdminStripePage />,
+  },
+  {
+    path: "/success",
+    element: <PaymentSuccessPage />,
+  },
   {
     path: "/reservation/:carId",
     element: <ReservationPage />,

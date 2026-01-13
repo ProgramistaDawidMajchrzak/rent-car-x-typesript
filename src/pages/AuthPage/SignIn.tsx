@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { register as registerUser } from '../../services/auth.service.js';
+import { register as registerUser } from "../../services/auth/service";
 import { Image } from '../../components/Image';
 import { getRoleFromToken } from '../../utils/jwt.utils';
 import { useNavigate } from 'react-router-dom';

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { confirmEmail } from "../../services/auth.service.js";
+import { confirmEmail } from "../../services/auth/service";
 import { Image } from "../../components/Image";
 
 export const EmailConfirmationPage: React.FC = () => {
@@ -18,9 +18,8 @@ export const EmailConfirmationPage: React.FC = () => {
       }
 
       try {
-        await confirmEmail(
-        `/auth/confirm-email?userId=${encodeURIComponent(userId)}&token=${encodeURIComponent(token)}`
-        );
+        await confirmEmail({ userId, token });
+
 
 
         setStatus("success");

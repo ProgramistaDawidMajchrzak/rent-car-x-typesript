@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { login as loginUser } from '../../services/auth.service.js';
+import { login as loginUser } from "../../services/auth/service";
 import { Image } from '../../components/Image';
 import { getRoleFromToken } from '../../utils/jwt.utils';
 import { useNavigate } from 'react-router-dom';
@@ -38,7 +38,7 @@ export const LogInPage: React.FC = () => {
       const role = getRoleFromToken(token);
       if (role) localStorage.setItem("role", role);
 
-      navigate(role === "ADMIN" ? "/admin" : "/");
+      navigate(role === "Admin" ? "/admin" : "/");
     } catch (err) {
       if (err instanceof Error) {
         setServerError(err.message);

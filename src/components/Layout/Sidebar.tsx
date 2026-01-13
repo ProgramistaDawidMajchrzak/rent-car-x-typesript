@@ -19,10 +19,15 @@ const Sidebar: React.FC = () => {
       </div>
 
       {/* Main icons, 20cm = ~200px */}
+      {/* Main icons */}
       <div className="flex flex-col items-center space-y-6 mt-[200px]">
-        <Icon onClick={() => navigate("/admin/users")} name="users" className="w-6 h-6 text-white cursor-pointer" />
+        <Icon onClick={() => navigate("/admin")} name="dashboard" className="w-6 h-6 text-white cursor-pointer" />
         <Icon onClick={() => navigate("/admin/cars")} name="cars" className="w-6 h-6 text-white cursor-pointer" />
+        <Icon onClick={() => navigate("/admin/reservations")} name="reservations" className="w-6 h-6 text-white cursor-pointer" />
+        <Icon onClick={() => navigate("/admin/exports")} name="reports" className="w-6 h-6 text-white cursor-pointer" />
+        <Icon onClick={() => navigate("/admin/stripe")} name="stripe" className="w-6 h-6 text-white cursor-pointer" />
       </div>
+
 
       {/* Logout at bottom */}
       <div className="flex flex-col items-center mb-4">

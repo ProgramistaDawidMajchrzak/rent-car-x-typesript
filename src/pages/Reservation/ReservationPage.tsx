@@ -1,14 +1,13 @@
-// src/pages/reservation/ReservationPage.tsx
 import React, { useEffect, useMemo, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import Layout from "../../components/Layout/Layout";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { createReservation } from "../../services/reservation.service"
-import { getCarById } from "../../services/cars.service";
 
-import { useLocation } from "react-router-dom";
+// ✅ poprawne importy pod Twoją strukturę
+import { createReservation } from "../../services/reservations/service";
+import { getCarById } from "../../services/cars/service";
 
 type Car = {
   id: string;
@@ -22,8 +21,8 @@ type Car = {
 };
 
 type FormValues = {
-  startDate: string;
-  endDate: string;
+  startDate: string; // YYYY-MM-DD
+  endDate: string;   // YYYY-MM-DD
 };
 
 const schema = yup.object().shape({
@@ -54,11 +53,39 @@ function todayISO() {
   return `${yyyy}-${mm}-${dd}`;
 }
 
+// ✅ backend chce ISO datetime, a input daje YYYY-MM-DD
+function dateToIso(dateYYYYMMDD: string) {
+  // UTC midnight (bez offsetów lokalnych)
+  return new Date(`${dateYYYYMMDD}T00:00:00.000Z`).toISOString();
+}
+
+function mapCarDetailsToCar(raw: any): Car {
+  return {
+    id: raw.id ?? raw.Id,
+    brand: raw.brand ?? raw.Brand ?? "",
+    model: raw.model ?? raw.Model ?? "",
+    year: raw.year ?? raw.Year ?? 0,
+    fuelType: raw.fuelType ?? raw.FuelType ?? "",
+    pricePerDay: raw.pricePerDay ?? raw.PricePerDay ?? 0,
+    isAvailable: Boolean(raw.isAvailable ?? raw.IsAvailable ?? raw.available ?? raw.Available),
+    photoUrl: raw.photoUrl ?? raw.PhotoUrl ?? raw.imageUrl ?? raw.ImageUrl ?? raw.photo ?? null,
+  };
+}
+
+function resolvePhotoUrl(photoUrl?: string | null) {
+  if (!photoUrl) return null;
+  if (photoUrl.startsWith("http://") || photoUrl.startsWith("https://")) return photoUrl;
+
+  // ✅ tu ustaw swój backend base url
+  // jeśli masz request baseURL = http://localhost:8080/api/v1, to zdjęcia zwykle są z hosta backendu
+  return `http://localhost:8080${photoUrl}`;
+}
+
 export const ReservationPage: React.FC = () => {
   const { carId } = useParams<{ carId: string }>();
   const navigate = useNavigate();
-
   const location = useLocation();
+
   const carFromState = (location.state as any)?.car as Car | undefined;
 
   const [car, setCar] = useState<Car | null>(carFromState ?? null);
@@ -66,6 +93,7 @@ export const ReservationPage: React.FC = () => {
   const [loadingCar, setLoadingCar] = useState(false);
 
   const [serverError, setServerError] = useState("");
+  const [ok, setOk] = useState("");
 
   const {
     register,
@@ -74,46 +102,32 @@ export const ReservationPage: React.FC = () => {
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     resolver: yupResolver(schema),
+    defaultValues: {
+      startDate: "",
+      endDate: "",
+    },
   });
 
   const startDate = watch("startDate");
   const endDate = watch("endDate");
 
-  const nights = useMemo(() => {
+  const days = useMemo(() => {
     if (!startDate || !endDate) return 0;
     return daysBetween(startDate, endDate);
   }, [startDate, endDate]);
 
   const pricePerDay = car?.pricePerDay ?? 0;
-  const subtotal = useMemo(() => nights * pricePerDay, [nights, pricePerDay]);
-
-  function mapCarDetailsToCar(raw: any): Car {
-  return {
-    id: raw.id ?? raw.Id,
-    brand: raw.brand ?? raw.Brand ?? "",
-    model: raw.model ?? raw.Model ?? "",
-    year: raw.year ?? raw.Year ?? 0,
-    fuelType: raw.fuelType ?? raw.FuelType ?? "",
-    pricePerDay: raw.pricePerDay ?? raw.PricePerDay ?? 0,
-    isAvailable: Boolean(
-      raw.isAvailable ??
-      raw.IsAvailable ??
-      raw.available ??
-      raw.Available
-    ),
-    photoUrl:
-      raw.photoUrl ?? raw.PhotoUrl ?? raw.imageUrl ?? raw.ImageUrl ?? raw.photo ?? null,
-  };
-}
+  const total = useMemo(() => days * pricePerDay, [days, pricePerDay]);
 
   useEffect(() => {
     if (!carId) return;
 
+    // jeśli car przyszedł w state, nie musisz robić requestu (ale możemy dociągnąć szczegóły)
     setLoadingCar(true);
     setCarError("");
+
     getCarById(carId)
       .then((data) => {
-        console.log("DETAILS isAvailable:", data?.isAvailable, "RAW:", data);
         const mapped = mapCarDetailsToCar(data);
         setCar((prev) => {
           const photoUrl = mapped.photoUrl ?? prev?.photoUrl ?? null;
@@ -126,17 +140,22 @@ export const ReservationPage: React.FC = () => {
 
   const onSubmit = async (data: FormValues) => {
     if (!carId) return;
+
     setServerError("");
+    setOk("");
 
     try {
-      await createReservation({
+      // ✅ swagger: startDate/endDate jako ISO datetime
+      const payload = {
         carId,
-        startDate: data.startDate,
-        endDate: data.endDate,
-      });
+        startDate: dateToIso(data.startDate),
+        endDate: dateToIso(data.endDate),
+      };
 
-      alert("Reservation created successfully!");
-      navigate("/my-account"); // albo /my-reservations
+      await createReservation(payload);
+
+      setOk("Reservation created successfully!");
+      setTimeout(() => navigate("/my-account"), 600);
     } catch (err: any) {
       setServerError(err?.message ?? "Failed to create reservation.");
       console.error(err);
@@ -153,19 +172,11 @@ export const ReservationPage: React.FC = () => {
     );
   }
 
-  function resolvePhotoUrl(photoUrl?: string | null) {
-    if (!photoUrl) return null;
-    if (photoUrl.startsWith("http://") || photoUrl.startsWith("https://")) return photoUrl;
-    return `http://localhost:5113${photoUrl}`;
-  }
-
   const imgSrc = resolvePhotoUrl(car?.photoUrl);
-
 
   return (
     <Layout>
       <div className="px-6 lg:px-32 py-10">
-        {/* Header row */}
         <div className="flex flex-col gap-2 mb-6">
           <button
             type="button"
@@ -182,27 +193,21 @@ export const ReservationPage: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* LEFT: Car summary */}
+          {/* LEFT */}
           <div className="lg:col-span-7">
             <div className="bg-white rounded-xl shadow-md border border-slate-900/10 overflow-hidden">
-              {/* Image */}
               <div className="bg-slate-50 h-[280px] flex items-center justify-center">
                 {loadingCar ? (
                   <div className="text-sm text-slate-500">Loading car...</div>
                 ) : imgSrc ? (
-                  <img
-                    src={imgSrc}
-                    alt="Car photo"
-                    className="w-80 max-h-full object-contain"
-                  />
+                  <img src={imgSrc} alt="Car" className="w-80 max-h-full object-contain" />
                 ) : (
                   <div className="text-xs text-gray-400">No photo</div>
                 )}
               </div>
+
               <div className="p-6">
-                {carError && (
-                  <p className="text-red-500 text-sm mb-3">{carError}</p>
-                )}
+                {carError && <p className="text-red-500 text-sm mb-3">{carError}</p>}
 
                 {!carError && car && (
                   <>
@@ -225,9 +230,7 @@ export const ReservationPage: React.FC = () => {
                         <div
                           className={
                             "text-xs font-bold mt-1 px-3 py-1 rounded-full inline-block " +
-                            (car.isAvailable
-                              ? "bg-green-50 text-green-700"
-                              : "bg-red-50 text-red-600")
+                            (car.isAvailable ? "bg-green-50 text-green-700" : "bg-red-50 text-red-600")
                           }
                         >
                           {car.isAvailable ? "Available" : "Unavailable"}
@@ -235,7 +238,6 @@ export const ReservationPage: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* perks */}
                     <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-3">
                       <div className="p-3 rounded-lg bg-slate-50 border border-slate-900/10">
                         <div className="text-xs font-bold text-slate-900">No hidden fees</div>
@@ -260,7 +262,7 @@ export const ReservationPage: React.FC = () => {
             </div>
           </div>
 
-          {/* RIGHT: Dates + summary */}
+          {/* RIGHT */}
           <div className="lg:col-span-5">
             <div className="bg-white rounded-xl shadow-md p-6 border border-slate-900/10">
               <div className="text-lg font-bold text-slate-900 mb-1">Choose your dates</div>
@@ -269,7 +271,6 @@ export const ReservationPage: React.FC = () => {
               </p>
 
               <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-                {/* Start date */}
                 <div className="flex flex-col gap-1">
                   <label className="text-xs font-bold">Start date</label>
                   <input
@@ -281,7 +282,6 @@ export const ReservationPage: React.FC = () => {
                   <p className="text-red-500 text-xs">{errors.startDate?.message}</p>
                 </div>
 
-                {/* End date */}
                 <div className="flex flex-col gap-1">
                   <label className="text-xs font-bold">End date</label>
                   <input
@@ -293,57 +293,36 @@ export const ReservationPage: React.FC = () => {
                   <p className="text-red-500 text-xs">{errors.endDate?.message}</p>
                 </div>
 
-                {/* Price summary */}
                 <div className="mt-2 rounded-xl border border-slate-900/10 bg-slate-50 p-4">
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-slate-600">Days</span>
-                    <span className="font-bold text-slate-900">{nights || 0}</span>
+                    <span className="font-bold text-slate-900">{days || 0}</span>
                   </div>
                   <div className="flex items-center justify-between text-sm mt-2">
                     <span className="text-slate-600">Price / day</span>
-                    <span className="font-bold text-slate-900">
-                      ${pricePerDay.toFixed(2)}
-                    </span>
+                    <span className="font-bold text-slate-900">${pricePerDay.toFixed(2)}</span>
                   </div>
                   <div className="h-px bg-slate-900/10 my-3" />
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-bold text-slate-900">Total</span>
-                    <span className="text-lg font-bold text-slate-900">
-                      ${subtotal.toFixed(2)}
-                    </span>
+                    <span className="text-lg font-bold text-slate-900">${total.toFixed(2)}</span>
                   </div>
-                  <p className="text-[11px] text-slate-500 mt-2">
-                    Total is estimated and may change based on final terms.
-                  </p>
                 </div>
 
-                {serverError && (
-                  <p className="text-red-600 text-xs font-medium">{serverError}</p>
-                )}
+                {serverError && <p className="text-red-600 text-xs font-medium">{serverError}</p>}
+                {ok && <p className="text-green-700 text-xs font-medium">{ok}</p>}
 
                 <button
                   type="submit"
-                  disabled={
-                    isSubmitting ||
-                    loadingCar ||
-                    !car ||
-                    car.isAvailable === false ||
-                    nights <= 0
-                  }
+                  disabled={isSubmitting || loadingCar || !car || !car.isAvailable || days <= 0}
                   className="mt-3 flex justify-center items-center px-4 rounded cursor-pointer bg-[#02193D] w-full h-[34px] text-xs font-bold text-white disabled:opacity-50"
                 >
                   {isSubmitting ? "Processing..." : "Confirm reservation"}
                 </button>
 
-                {!loadingCar && car && car.isAvailable === false && (
+                {!loadingCar && car && !car.isAvailable && (
                   <p className="text-xs text-red-600">
                     This car is currently unavailable. Please choose another car.
-                  </p>
-                )}
-
-                {nights > 0 && (
-                  <p className="text-[11px] text-slate-500">
-                    By confirming, you agree to the rental terms and conditions.
                   </p>
                 )}
               </form>

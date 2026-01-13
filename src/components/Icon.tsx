@@ -6,6 +6,10 @@ import { ReactComponent as Logo } from "../assets/icons/logo-admin.svg";
 import { ReactComponent as Users } from "../assets/icons/users-nav.svg";
 import { ReactComponent as Cars } from "../assets/icons/cars-admin.svg";
 import { ReactComponent as Logout } from "../assets/icons/logout.svg";
+import { ReactComponent as Export } from "../assets/icons/export.svg";
+import { ReactComponent as Stripe } from "../assets/icons/stripe.svg";
+import { ReactComponent as Reservations } from "../assets/icons/reservations.svg";
+
 
 const icons = {
   heart: Heart,
@@ -15,6 +19,10 @@ const icons = {
   logo: Logo,
   users: Users,
   cars: Cars,
+  dashboard: Users,
+  reservations: Reservations,
+  reports: Export,
+  stripe: Stripe,
   logout: Logout,
 };
 

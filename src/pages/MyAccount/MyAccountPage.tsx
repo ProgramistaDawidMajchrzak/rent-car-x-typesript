@@ -2,9 +2,10 @@ import React, { useEffect, useMemo, useState } from "react";
 import Layout from "../../components/Layout/Layout";
 import {
   getMyReservations,
-  deleteReservation,
+  cancelReservation,
   payReservation,
-} from "../../services/reservation.service";
+} from "../../services/reservations/service";
+
 
 type Reservation = {
   id: string;
@@ -68,7 +69,7 @@ export const MyAccountPage: React.FC = () => {
 
     setBusyId(id);
     try {
-      await deleteReservation(id);
+      await cancelReservation(id);
       await loadReservations();
     } catch (err) {
       alert("Failed to cancel reservation.");
@@ -80,14 +81,26 @@ export const MyAccountPage: React.FC = () => {
   const handlePay = async (id: string) => {
     setBusyId(id);
     try {
-      const checkoutUrl = await payReservation(id);
-      window.location.href = checkoutUrl;
+      const data = await payReservation(id);
+
+      const checkoutUrl =
+        typeof data === "string"
+          ? data
+          : data?.checkoutUrl || data?.url || data?.redirectUrl;
+
+      if (!checkoutUrl || typeof checkoutUrl !== "string") {
+        throw new Error("API did not return a checkout URL.");
+      }
+
+      window.location.assign(checkoutUrl);
     } catch (err) {
-      alert("Payment failed.");
+      console.error(err);
+      alert(err instanceof Error ? err.message : "Payment failed.");
     } finally {
       setBusyId(null);
     }
   };
+
 
   return (
     <Layout>

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { forgotPassword } from "../../services/auth.service.js";
+import { forgotPassword } from "../../services/auth/service";
 import { Image } from "../../components/Image";
 
 const schema = yup.object({
@@ -28,7 +28,7 @@ export const ForgotPasswordPage: React.FC = () => {
     setServerError("");
 
     try {
-      const res = await forgotPassword(data.email);
+      const res = await forgotPassword({ email: data.email });
       setInfo("If the account exists, you’ll receive a reset email in MailDev.");
       if (res?.resetLink) setResetLink(res.resetLink);
     } catch (e) {
