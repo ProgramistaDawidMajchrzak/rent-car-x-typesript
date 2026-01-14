@@ -344,7 +344,7 @@ export const AdminCars: React.FC = () => {
             <div className="flex flex-row items-center gap-2">
               <input type="file" accept="image/*" {...register("photo" as any)} />
               <label className="text-xs font-bold">Photo</label>
-              <span className="text-[10px] text-gray-400">(API JSON – upload osobno)</span>
+              {/* <span className="text-[10px] text-gray-400">(API JSON – upload osobno)</span> */}
             </div>
 
             {serverError && <p className="text-red-500 text-xs">{serverError}</p>}
@@ -359,7 +359,7 @@ export const AdminCars: React.FC = () => {
             </button>
           </form>
 
-          {/* FILTRY GET /cars */}
+          {/* FILTRY GET /cars
           <div className="mt-8">
             <h3 className="text-lg font-bold mb-3">Filters</h3>
 
@@ -459,8 +459,8 @@ export const AdminCars: React.FC = () => {
                 </div>
               )}
             </div>
-          </div>
-        </div>
+          </div>*/}
+        </div> 
 
         {/* PRAWA – lista aut */}
         <div className="flex-1">

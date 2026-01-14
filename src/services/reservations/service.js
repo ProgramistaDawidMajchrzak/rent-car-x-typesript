@@ -73,21 +73,51 @@ export const payReservation = async (id) => {
   }
 };
 
-// Swagger: POST /generate-pdf -> text/plain -> string (brak body)
 export const generatePdf = async () => {
   try {
-    const res = await request.post("/reservations/generate-pdf");
-    return res.data; // string
+    const res = await request.post("/reservations/generate-pdf", {}, {
+      responseType: "blob", 
+    });
+
+    const blob = new Blob([res.data], { type: "application/pdf" });
+    const url = window.URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", `reservations_${new Date().getTime()}.pdf`);
+    document.body.appendChild(link);
+    link.click();
+
+    link.remove();
+    window.URL.revokeObjectURL(url);
+
+    return res.data;
   } catch (e) {
     throw toApiError(e, "Generate PDF failed.");
   }
 };
 
-// analogicznie (zakładam też string)
 export const generateXlsx = async () => {
   try {
-    const res = await request.post("/reservations/generate-xlsx");
-    return res.data; // string
+    const res = await request.post("/reservations/generate-xlsx", {}, {
+      responseType: "blob",
+    });
+
+    const blob = new Blob([res.data], { 
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" 
+    });
+    const url = window.URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", `reservations_${new Date().getTime()}.xlsx`);
+    document.body.appendChild(link);
+    link.click();
+
+    link.remove();
+    window.URL.revokeObjectURL(url);
+
+    return res.data;
   } catch (e) {
     throw toApiError(e, "Generate XLSX failed.");
   }
