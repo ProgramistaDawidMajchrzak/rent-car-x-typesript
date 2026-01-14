@@ -1,5 +1,6 @@
 import React from 'react';
 import {Image} from '../../../components/Image';
+import { useNavigate } from 'react-router-dom';
 
 export const CarRentalHero: React.FC = () => {
   return (
@@ -21,6 +22,8 @@ const HeroContent: React.FC = () => {
       { text: "cars.", lineBreak: false }
     ];
 
+    const navigate = useNavigate()
+
     return (
       <div className="flex z-10 flex-col gap-12 items-start py-8 pr-8 pl-0 mt-12 ml-40 bg-black bg-opacity-10 h-[445px] w-[528px] max-md:p-4 max-md:w-[90%] max-sm:p-2 max-sm:w-full">
         <div className="text-5xl font-[700] text-white max-sm:text-3xl">
@@ -38,7 +41,7 @@ const HeroContent: React.FC = () => {
             <span>experience in car rental.</span>
           </span>
         </div>
-        <button className="px-6 py-3 w-64 text-2xl bg-white rounded cursor-pointer text-neutral-900 max-sm:px-4 max-sm:py-2.5 max-sm:w-full max-sm:text-lg">
+        <button onClick={() => navigate("/car-list")} className="px-6 py-3 w-64 text-2xl bg-white rounded cursor-pointer text-neutral-900 max-sm:px-4 max-sm:py-2.5 max-sm:w-full max-sm:text-lg">
           Explore Now
         </button>
       </div>

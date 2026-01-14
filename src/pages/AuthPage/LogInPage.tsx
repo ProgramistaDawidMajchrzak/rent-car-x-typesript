@@ -97,11 +97,10 @@ export const LogInPage: React.FC = () => {
             </div>
 
             <div className="flex gap-4">
-              <a href="/signin">
-                <div className="flex items-center justify-center px-4 text-xs font-bold rounded border cursor-pointer border-slate-900 h-[30px] w-[160px] text-slate-900">
+                <div onClick={() => navigate("/signin")} className="flex items-center justify-center px-4 text-xs font-bold rounded border cursor-pointer border-slate-900 h-[30px] w-[160px] text-slate-900">
                   Sign In
                 </div>
-              </a>
+              
 
               <button
                 type="submit"

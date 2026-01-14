@@ -1,5 +1,6 @@
 import React from "react";
 import { Image } from "../../../components/Image";
+import { useNavigate } from "react-router-dom";
 
 export const CarRentalHeroCompact: React.FC = () => {
   return (
@@ -16,6 +17,7 @@ export const CarRentalHeroCompact: React.FC = () => {
 };
 
 const HeroContentCompact: React.FC = () => {
+  const navigate = useNavigate();
   return (
     <div className="flex z-10 flex-col gap-6 items-start py-6 pr-6 pl-0 mt-8 ml-32 bg-black bg-opacity-10 h-[240px] w-[420px] max-md:ml-0 max-md:w-[90%] max-md:p-4">
       {/* Title */}
@@ -32,7 +34,7 @@ const HeroContentCompact: React.FC = () => {
 
       {/* CTA */}
       <button
-        onClick={() => window.location.href = "/car-list"}
+        onClick={() => navigate("/car-list")}
         className="px-5 py-2.5 w-48 text-lg bg-white rounded cursor-pointer text-neutral-900 hover:bg-gray-100 transition max-sm:w-full"
       >
         Explore Cars

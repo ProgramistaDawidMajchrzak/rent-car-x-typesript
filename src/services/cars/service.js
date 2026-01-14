@@ -19,7 +19,6 @@ export const getCarById = async (id) => {
   }
 };
 
-// ✅ zgodnie ze swagger: { carData: {...} }
 export const createCar = async (carData) => {
   try {
     const res = await request.post("/cars", { carData });

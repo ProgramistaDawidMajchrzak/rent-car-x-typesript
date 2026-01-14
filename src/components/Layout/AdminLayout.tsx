@@ -9,7 +9,7 @@ type LayoutProps = {
 
 const AdminLayout: React.FC<LayoutProps> = ({ title, children }) => {
   return (
-    <main className="overflow-hidden relative w-full h-screen bg-white">
+    <main className="relative w-full h-screen bg-white flex overflow-x-hidden">
       <Sidebar />
       <div>
         <AdminHeader title={title} />

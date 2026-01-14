@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createHashRouter, RouterProvider } from "react-router-dom";
 import { HomePage } from "../pages/Home/HomePage";
 import { CarListPage } from "../pages/CarListPage/CarListPage";
 import { SignInPage } from "../pages/AuthPage/SignIn";
@@ -16,72 +16,23 @@ import { AdminExportsPage } from "../pages/AdminBoard/ExportsPage";
 import { AdminStripePage } from "../pages/AdminBoard/AdminStripePage";
 import { PaymentSuccessPage } from "../pages/Payments/PaymentSuccessPage";
 
-
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <HomePage />,
-  },
-  {
-    path: "/car-list",
-    element: <CarListPage />,
-  },
-  {
-    path: "/signin",
-    element: <SignInPage />,
-  },
-  {
-    path: "/confirm-email",
-    element: <EmailConfirmationPage />,
-  },
-  {
-    path: "/login",
-    element: <LogInPage />,
-  },
-  {
-    path: "/forgot-password",
-    element: <ForgotPasswordPage />,
-  },
-  {
-    path: "/reset-password",
-    element: <ResetPasswordPage />,
-  },
-  {
-    path: "/my-account",
-    element: <MyAccountPage />,
-  },
-  {
-    path: "/admin",
-    element: <Board />,
-  },
-  {
-    path: "/admin/users",
-    element: <AdminUsers />,
-  },
-  {
-    path: "/admin/cars",
-    element: <AdminCars />,
-  },
-  {
-    path: "/admin/reservations",
-    element: <AdminReservations />,
-  },
-  {
-    path: "/admin/exports",
-    element: <AdminExportsPage />,
-  },
-  {
-    path: "/admin/stripe",
-    element: <AdminStripePage />,
-  },
-  {
-    path: "/success",
-    element: <PaymentSuccessPage />,
-  },
-  {
-    path: "/reservation/:carId",
-    element: <ReservationPage />,
-  },
+const router = createHashRouter([
+  { path: "/", element: <HomePage /> },
+  { path: "/car-list", element: <CarListPage /> },
+  { path: "/signin", element: <SignInPage /> },
+  { path: "/confirm-email", element: <EmailConfirmationPage /> },
+  { path: "/login", element: <LogInPage /> },
+  { path: "/forgot-password", element: <ForgotPasswordPage /> },
+  { path: "/reset-password", element: <ResetPasswordPage /> },
+  { path: "/my-account", element: <MyAccountPage /> },
+  { path: "/admin", element: <Board /> },
+  { path: "/admin/users", element: <AdminUsers /> },
+  { path: "/admin/cars", element: <AdminCars /> },
+  { path: "/admin/reservations", element: <AdminReservations /> },
+  { path: "/admin/exports", element: <AdminExportsPage /> },
+  { path: "/admin/stripe", element: <AdminStripePage /> },
+  { path: "/success", element: <PaymentSuccessPage /> },
+  { path: "/reservation/:carId", element: <ReservationPage /> },
 ]);
 
 export const AppRouter = () => <RouterProvider router={router} />;

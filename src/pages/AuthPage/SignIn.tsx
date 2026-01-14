@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { CustomModal } from '../../components/modal';
 
 
+
 const schema = yup.object().shape({
   username: yup.string().required('Username is required'),
   email: yup.string().email('Invalid email').required('Email is required'),
@@ -135,11 +136,12 @@ export const SignInPage: React.FC = () => {
 
             {/* Buttons */}
             <div className="flex gap-4">
-              <a href="/login">
-                <div className="flex items-center justify-center px-4 text-xs font-bold rounded border cursor-pointer border-slate-900 h-[30px] w-[160px] text-slate-900">
-                  Log In
-                </div>
-              </a>
+              <div
+                onClick={() => navigate("/login")}
+                className="flex items-center justify-center px-4 text-xs font-bold rounded border cursor-pointer border-slate-900 h-[30px] w-[160px] text-slate-900"
+              >
+                Log In
+              </div>
 
               <button
                 type="submit"

@@ -5,6 +5,7 @@ import {
   cancelReservation,
   payReservation,
 } from "../../services/reservations/service";
+import { useNavigate } from "react-router-dom";
 
 
 type Reservation = {
@@ -15,7 +16,6 @@ type Reservation = {
   endDate: string;
   totalCost: number;
 
-  // jeśli backend kiedyś doda:
   isPaid?: boolean;
 };
 
@@ -36,9 +36,9 @@ export const MyAccountPage: React.FC = () => {
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-
-  // UX: blokuj przyciski w trakcie akcji na konkretnej rezerwacji
   const [busyId, setBusyId] = useState<string | null>(null);
+
+  const navigate = useNavigate()
 
   const loadReservations = async () => {
     setError("");
@@ -179,12 +179,12 @@ export const MyAccountPage: React.FC = () => {
             <div className="text-sm text-slate-600 mb-6">
               Choose a car and book your first rental in a few clicks.
             </div>
-            <a
-              href="/car-list"
+            <div
+              onClick={() => navigate("/car-list")}
               className="inline-flex items-center justify-center px-6 h-[38px] rounded-lg bg-slate-900 text-white text-xs font-bold"
             >
               Browse cars
-            </a>
+            </div>
           </div>
         )}
 
