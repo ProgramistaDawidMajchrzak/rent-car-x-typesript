@@ -188,12 +188,11 @@ export const MyAccountPage: React.FC = () => {
           </div>
         )}
 
-        {/* List */}
         {!isLoading && reservations.length > 0 && (
           <div className="grid grid-cols-1 gap-4">
             {reservations.map((r) => {
               const days = daysBetween(r.startDate, r.endDate);
-              const paid = Boolean(r.isPaid); // jak backend nie zwraca, będzie false
+              const paid = Boolean(r.isPaid);
               const isBusy = busyId === r.id;
 
               return (
@@ -201,7 +200,6 @@ export const MyAccountPage: React.FC = () => {
                   key={r.id}
                   className="bg-white rounded-xl border border-slate-900/10 shadow-sm overflow-hidden"
                 >
-                  {/* top strip */}
                   <div className="px-5 py-4 border-b border-slate-900/10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div className="flex items-start gap-3">
                       <div className="w-11 h-11 rounded-xl bg-slate-50 border border-slate-900/10 flex items-center justify-center font-bold text-slate-900">
@@ -248,7 +246,6 @@ export const MyAccountPage: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* actions */}
                   <div className="px-5 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div className="text-xs text-slate-600">
                       Need changes? You can cancel the reservation anytime.
@@ -257,7 +254,7 @@ export const MyAccountPage: React.FC = () => {
                     <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
                       <button
                         onClick={() => handlePay(r.id)}
-                        disabled={isBusy /* || paid */}
+                        disabled={isBusy}
                         className={
                           "px-4 h-[34px] rounded-lg text-xs font-bold " +
                           (isBusy

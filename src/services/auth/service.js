@@ -3,8 +3,6 @@ import { toApiError, extractJwtToken } from "../_helpers";
 
 export const register = async (body) => {
   try {
-    // body: { username, email, password }
-    // response: { jwtToken, userId, confirmationLink }
     const res = await request.post("/auth/register", body);
     return res.data;
   } catch (e) {
@@ -14,7 +12,6 @@ export const register = async (body) => {
 
 export const login = async (body) => {
   try {
-    // body: { email, password }
     const res = await request.post("/auth/login", body);
 
     const token = extractJwtToken(res.data);
@@ -35,7 +32,6 @@ export const logout = async () => {
 
 export const confirmEmail = async ({ userId, token }) => {
   try {
-    // Swagger: query params
     const res = await request.post("/auth/confirm-email", null, {
       params: { userId, token },
     });
@@ -47,7 +43,6 @@ export const confirmEmail = async ({ userId, token }) => {
 
 export const forgotPassword = async ({ email }) => {
   try {
-    // response: { resetLink }
     const res = await request.post("/auth/forgot-password", { email });
     return res.data;
   } catch (e) {
@@ -57,7 +52,6 @@ export const forgotPassword = async ({ email }) => {
 
 export const resetPassword = async (body) => {
   try {
-    // body: { userId, token, newPassword }
     const res = await request.post("/auth/reset-password", body);
     return res.data;
   } catch (e) {

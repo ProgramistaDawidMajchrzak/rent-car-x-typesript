@@ -13,7 +13,7 @@ const TopBar: React.FC = () => {
   };
 
   const logged = isLoggedIn();
-  const role = getRole(); // USER / ADMIN
+  const role = getRole();
 
   return (
     <header className="bg-white shadow-md py-4 px-6 flex justify-between items-center flex-wrap gap-3">

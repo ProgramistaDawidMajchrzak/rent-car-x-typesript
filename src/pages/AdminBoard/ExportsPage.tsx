@@ -10,7 +10,6 @@ export const AdminExportsPage: React.FC = () => {
   const [loadingXlsx, setLoadingXlsx] = useState(false);
 
   const run = async (fn: () => Promise<any>, okMsg: string, setLoading: (v: boolean) => void) => {
-    // Resetujemy stany przed nową akcją
     setServerError("");
     setSuccess("");
     setLoading(true);
@@ -19,8 +18,6 @@ export const AdminExportsPage: React.FC = () => {
       await fn();
       setSuccess(okMsg);
     } catch (e) {
-      // Jeśli błąd to Blob (częste przy responseType: 'blob'), trzeba by go sparsować na tekst, 
-      // ale na razie obsłużmy standardowo:
       setServerError(e instanceof Error ? e.message : "Action failed.");
       console.error("Export error:", e);
     } finally {
@@ -30,7 +27,6 @@ export const AdminExportsPage: React.FC = () => {
 
   return (
     <AdminLayout title="Exports / Reports">
-      {/* Container ze scrollowaniem (nawiązując do Twojego pierwszego pytania) */}
       <div className="p-10 h-full overflow-y-auto"> 
         <div className="max-w-[900px]">
           <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
@@ -41,7 +37,7 @@ export const AdminExportsPage: React.FC = () => {
 
             <div className="flex gap-4 flex-wrap">
               <button
-                type="button" // Dodano type button
+                type="button"
                 onClick={() => run(generatePdf, "PDF generated and downloaded.", setLoadingPdf)}
                 disabled={loadingPdf || loadingXlsx}
                 className="flex justify-center items-center px-4 rounded cursor-pointer bg-[#02193D] h-[34px] text-xs font-bold text-white disabled:opacity-50 hover:bg-[#032a66] transition-colors"
@@ -50,7 +46,7 @@ export const AdminExportsPage: React.FC = () => {
               </button>
 
               <button
-                type="button" // Dodano type button
+                type="button"
                 onClick={() => run(generateXlsx, "XLSX generated and downloaded.", setLoadingXlsx)}
                 disabled={loadingPdf || loadingXlsx}
                 className="flex justify-center items-center px-4 rounded cursor-pointer bg-[#02193D] h-[34px] text-xs font-bold text-white disabled:opacity-50 hover:bg-[#032a66] transition-colors"
@@ -59,7 +55,6 @@ export const AdminExportsPage: React.FC = () => {
               </button>
             </div>
 
-            {/* Komunikaty zwrotne */}
             {serverError && (
               <div className="mt-4 p-3 bg-red-50 border border-red-100 rounded-lg">
                 <p className="text-red-600 text-xs font-medium">{serverError}</p>

@@ -57,14 +57,14 @@ export const AdminReservations: React.FC = () => {
   const [serverError, setServerError] = useState("");
   const [success, setSuccess] = useState("");
 
-  // sort/pagination
+
   const [sortField, setSortField] = useState<SortField>("startDate");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
 
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
 
-  // details modal
+
   const [openId, setOpenId] = useState<string | null>(null);
   const [details, setDetails] = useState<ReservationDetails | null>(null);
   const [detailsLoading, setDetailsLoading] = useState(false);
@@ -106,7 +106,6 @@ export const AdminReservations: React.FC = () => {
       let av: any = a[sortField];
       let bv: any = b[sortField];
 
-      // dates sort as timestamp
       if (sortField === "startDate" || sortField === "endDate") {
         av = new Date(av).getTime();
         bv = new Date(bv).getTime();
@@ -177,7 +176,6 @@ export const AdminReservations: React.FC = () => {
           </button>
         </div>
 
-        {/* messages */}
         {serverError && (
           <div className="mb-4 text-xs font-medium text-red-700 bg-red-50 border border-red-100 rounded p-3">
             {serverError}
@@ -189,7 +187,6 @@ export const AdminReservations: React.FC = () => {
           </div>
         )}
 
-        {/* table */}
         <div className="overflow-x-auto border border-slate-200 rounded-lg bg-white">
           <table className="min-w-full text-xs">
             <thead className="bg-[#02193D] text-white">
@@ -280,14 +277,7 @@ export const AdminReservations: React.FC = () => {
                           Details
                         </button>
 
-                        <button
-                          onClick={() =>
-                            runAction("Pay", () => payReservation(r.id))
-                          }
-                          className="px-2 py-1 text-[11px] rounded border border-slate-300 hover:bg-slate-50"
-                        >
-                          Pay
-                        </button>
+                  
 
                         <button
                           onClick={() =>
@@ -325,7 +315,6 @@ export const AdminReservations: React.FC = () => {
           </table>
         </div>
 
-        {/* pagination */}
         <div className="flex items-center justify-between mt-4 text-xs">
           <div>
             Page {currentPage} of {totalPages} • Total: {sorted.length}
@@ -349,7 +338,7 @@ export const AdminReservations: React.FC = () => {
         </div>
       </div>
 
-      {/* DETAILS MODAL */}
+    
       {openId && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl shadow-lg p-6 w-[520px] max-w-[92vw] relative">

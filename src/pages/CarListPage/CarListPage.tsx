@@ -1,13 +1,12 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import Layout from "../../components/Layout/Layout";
 import { CarRentalHeroCompact } from "../Home/components/CarRentalHeroCompact";
 import { CarCard } from "../../components/Cars/CarCard";
-import { getCars } from "../../services/cars.service";
+import { getCars } from "../../services/cars/service";
 
 import { brands, fuelTypes, getModelsByBrand } from "../../helpers/carSchema";
-
 
 type Car = {
   id: string;
@@ -17,35 +16,10 @@ type Car = {
   fuelType: string;
   pricePerDay: number;
   isAvailable: boolean;
-  photoUrl?: string | null;
+  imageUrl?: string | null;
 };
 
 const PAGE_SIZE = 16;
-
-/** Debounce helper (przyda się też później jeśli wrócą inputy) */
-function useDebouncedCallback(callback: () => void, delayMs: number) {
-  const timeoutRef = useRef<number | null>(null);
-
-  return () => {
-    if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
-    timeoutRef.current = window.setTimeout(() => {
-      callback();
-    }, delayMs);
-  };
-}
-
-// Sztywne marki + modele (3 najpopularniejsze per marka – przykładowe)
-// const BRAND_OPTIONS = ["Audi", "BMW", "Volkswagen", "Skoda", "Toyota", "Mazda", "Volvo"] as const;
-
-// const MODELS_BY_BRAND: Record<(typeof BRAND_OPTIONS)[number], string[]> = {
-//   Audi: ["A3", "A4", "Q5"],
-//   BMW: ["3 Series", "5 Series", "X5"],
-//   Volkswagen: ["Golf", "Passat", "Tiguan"],
-//   Skoda: ["Octavia", "Superb", "Kodiaq"],
-//   Toyota: ["Corolla", "Yaris", "RAV4"],
-//   Mazda: ["Mazda 3", "CX-5", "MX-5"],
-//   Volvo: ["XC60", "XC90", "S60"],
-// };
 
 type Availability = "ALL" | "AVAILABLE" | "UNAVAILABLE";
 
@@ -67,6 +41,20 @@ const emptyFilters: Filters = {
   isAvailable: null,
 };
 
+function parseCarsResponse(data: any): {
+  items: Car[];
+  totalPages?: number;
+  totalCount?: number;
+} {
+  if (Array.isArray(data)) return { items: data };
+
+  const items: Car[] = data?.items ?? data?.data ?? data?.results ?? [];
+  const totalPages: number | undefined = data?.totalPages ?? data?.pages;
+  const totalCount: number | undefined = data?.totalCount ?? data?.totalItems ?? data?.count;
+
+  return { items, totalPages, totalCount };
+}
+
 export const CarListPage: React.FC = () => {
   const navigate = useNavigate();
 
@@ -74,23 +62,27 @@ export const CarListPage: React.FC = () => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  // ------- UI state (draft) - edytujesz w panelu filtrów, ale nie odpala requestu
-  const [draftBrand, setDraftBrand] = useState<string>("");
-  const [draftModel, setDraftModel] = useState<string>("");
-  const [draftFuelType, setDraftFuelType] = useState<string>("");
-  const [draftMinPrice, setDraftMinPrice] = useState<string>("");
-  const [draftMaxPrice, setDraftMaxPrice] = useState<string>("");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState<number | null>(null);
+  const [totalCount, setTotalCount] = useState<number | null>(null);
+
+  const [draftBrand, setDraftBrand] = useState("");
+  const [draftModel, setDraftModel] = useState("");
+  const [draftFuelType, setDraftFuelType] = useState("");
+  const [draftMinPrice, setDraftMinPrice] = useState("");
+  const [draftMaxPrice, setDraftMaxPrice] = useState("");
   const [draftAvailability, setDraftAvailability] = useState<Availability>("ALL");
 
-  // ------- Applied filters - dopiero to idzie do API
   const [applied, setApplied] = useState<Filters>(emptyFilters);
 
-  // ------- Paginacja
-  const [page, setPage] = useState(1);
+  const availableModels = useMemo(
+    () => (draftBrand ? getModelsByBrand(draftBrand) : []),
+    [draftBrand]
+  );
+  const modelDisabled = !draftBrand;
 
   const appliedLabelChips = useMemo(() => {
     const chips: { key: keyof Filters; label: string }[] = [];
-
     if (applied.brand) chips.push({ key: "brand", label: `Brand: ${applied.brand}` });
     if (applied.model) chips.push({ key: "model", label: `Model: ${applied.model}` });
     if (applied.fuelType) chips.push({ key: "fuelType", label: `Fuel: ${applied.fuelType}` });
@@ -103,58 +95,50 @@ export const CarListPage: React.FC = () => {
     return chips;
   }, [applied]);
 
-  const availableModels = useMemo(() => {
-    if (!draftBrand) return [];
-    return getModelsByBrand(draftBrand);
-  }, [draftBrand]);
-
-  const modelDisabled = !draftBrand;
-
-  const total = cars.length;
-  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
-
-  const pageCars = useMemo(() => {
-    const start = (page - 1) * PAGE_SIZE;
-    return cars.slice(start, start + PAGE_SIZE);
-  }, [cars, page]);
-
-  const loadCars = async (filters: Filters) => {
+  const loadCars = async (filters: Filters, pageNumber: number) => {
     setError("");
     setIsLoading(true);
 
     try {
-      const data = await getCars({
-        brand: filters.brand,
-        model: filters.model,
-        fuelType: filters.fuelType,
-        minPrice: filters.minPrice,
-        maxPrice: filters.maxPrice,
-        isAvailable: filters.isAvailable,
-      });
+      const params: any = {
+        pageNumber,
+        pageSize: PAGE_SIZE,
+      };
 
-      setCars(data);
-      setPage(1);
+      if (filters.brand) params.brand = filters.brand;
+      if (filters.model) params.model = filters.model;
+      if (filters.fuelType) params.fuelType = filters.fuelType;
+
+      if (filters.minPrice && !Number.isNaN(Number(filters.minPrice))) {
+        params.minPrice = Number(filters.minPrice);
+      }
+      if (filters.maxPrice && !Number.isNaN(Number(filters.maxPrice))) {
+        params.maxPrice = Number(filters.maxPrice);
+      }
+
+      if (filters.isAvailable !== null) params.isAvailable = filters.isAvailable;
+
+      const data = await getCars(params);
+      const parsed = parseCarsResponse(data);
+
+      setCars(parsed.items);
+      setTotalPages(parsed.totalPages ?? null);
+      setTotalCount(parsed.totalCount ?? null);
     } catch (e) {
       console.error(e);
       setError(e instanceof Error ? e.message : "Unable to load cars.");
       setCars([]);
+      setTotalPages(null);
+      setTotalCount(null);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Na start: pobierz wszystko
   useEffect(() => {
-    loadCars(emptyFilters);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    loadCars(applied, page);
+  }, [applied, page]);
 
-  // Debounce apply (po to, żeby szybkie kliki nie robiły 10 requestów)
-  const debouncedApply = useDebouncedCallback(() => {
-    loadCars(applied);
-  }, 250);
-
-  // Apply: przepisujemy draft -> applied i robimy request (debounced)
   const applyFilters = () => {
     const nextApplied: Filters = {
       brand: draftBrand.trim() ? draftBrand.trim() : null,
@@ -163,11 +147,15 @@ export const CarListPage: React.FC = () => {
       minPrice: draftMinPrice.trim() ? draftMinPrice.trim() : null,
       maxPrice: draftMaxPrice.trim() ? draftMaxPrice.trim() : null,
       isAvailable:
-        draftAvailability === "ALL" ? null : draftAvailability === "AVAILABLE" ? true : false,
+        draftAvailability === "ALL"
+          ? null
+          : draftAvailability === "AVAILABLE"
+          ? true
+          : false,
     };
 
+    setPage(1);
     setApplied(nextApplied);
-    loadCars(nextApplied);
   };
 
   const clearAll = () => {
@@ -177,20 +165,19 @@ export const CarListPage: React.FC = () => {
     setDraftMinPrice("");
     setDraftMaxPrice("");
     setDraftAvailability("ALL");
+
+    setPage(1);
     setApplied(emptyFilters);
-    loadCars(emptyFilters);
   };
 
   const removeChip = (key: keyof Filters) => {
     const next: Filters = { ...applied, [key]: null };
 
-    // zależność: jeśli usuwasz brand, usuń też model
     if (key === "brand") next.model = null;
 
+    setPage(1);
     setApplied(next);
-    loadCars(next);
 
-    // zsynchronizuj draft, żeby UI w panelu też się zgadzał
     if (key === "brand") {
       setDraftBrand("");
       setDraftModel("");
@@ -201,7 +188,12 @@ export const CarListPage: React.FC = () => {
     if (key === "maxPrice") setDraftMaxPrice("");
     if (key === "isAvailable") setDraftAvailability("ALL");
   };
-  
+
+  const canPrev = page > 1;
+  const canNext =
+    totalPages !== null ? page < totalPages : cars.length === PAGE_SIZE;
+
+  const totalLabel = totalCount !== null ? totalCount : cars.length;
 
   return (
     <Layout>
@@ -224,7 +216,7 @@ export const CarListPage: React.FC = () => {
               </div>
 
               <div className="flex flex-col gap-4">
-                {/* Brand select */}
+                {/* Brand */}
                 <div className="flex flex-col gap-1">
                   <label className="text-xs font-bold">Brand</label>
                   <select
@@ -238,12 +230,14 @@ export const CarListPage: React.FC = () => {
                   >
                     <option value="">All</option>
                     {brands.map((b) => (
-                      <option key={b} value={b}>{b}</option>
+                      <option key={b} value={b}>
+                        {b}
+                      </option>
                     ))}
-
                   </select>
                 </div>
 
+                {/* Model */}
                 <div className="flex flex-col gap-1">
                   <label className="text-xs font-bold">Model</label>
                   <select
@@ -256,7 +250,9 @@ export const CarListPage: React.FC = () => {
                         : "px-2 w-full text-xs rounded-lg border border-slate-900 border-opacity-50 h-[30px]"
                     }
                   >
-                    <option value="">{modelDisabled ? "Select brand first" : "All"}</option>
+                    <option value="">
+                      {modelDisabled ? "Select brand first" : "All"}
+                    </option>
                     {!modelDisabled &&
                       availableModels.map((m) => (
                         <option key={m} value={m}>
@@ -266,6 +262,7 @@ export const CarListPage: React.FC = () => {
                   </select>
                 </div>
 
+                {/* Fuel */}
                 <div className="flex flex-col gap-1">
                   <label className="text-xs font-bold">Fuel type</label>
                   <select
@@ -273,12 +270,16 @@ export const CarListPage: React.FC = () => {
                     onChange={(e) => setDraftFuelType(e.target.value)}
                     className="px-2 w-full text-xs rounded-lg border border-slate-900 border-opacity-50 h-[30px]"
                   >
+                    <option value="">All</option>
                     {fuelTypes.map((f) => (
-                      <option key={f} value={f}>{f}</option>
+                      <option key={f} value={f}>
+                        {f}
+                      </option>
                     ))}
                   </select>
                 </div>
 
+                {/* Price */}
                 <div className="flex gap-3">
                   <div className="flex flex-col gap-1 w-1/2">
                     <label className="text-xs font-bold">Min price</label>
@@ -303,6 +304,7 @@ export const CarListPage: React.FC = () => {
                   </div>
                 </div>
 
+                {/* Availability */}
                 <div className="flex flex-col gap-1">
                   <label className="text-xs font-bold">Availability</label>
                   <select
@@ -364,21 +366,22 @@ export const CarListPage: React.FC = () => {
 
             <div className="flex items-center justify-between mb-4">
               <div className="text-sm text-slate-700">
-                {isLoading ? "Loading..." : `Showing ${total} cars`}
+                {isLoading ? "Loading..." : `Showing ${cars.length} of ${totalLabel} cars`}
               </div>
               <div className="text-sm text-slate-700">
-                Page {page} / {totalPages}
+                Page {page}
+                {totalPages !== null ? ` / ${totalPages}` : ""}
               </div>
             </div>
 
             {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
 
-            {!error && !isLoading && total === 0 && (
+            {!error && !isLoading && cars.length === 0 && (
               <p className="text-gray-500 text-sm">No cars available.</p>
             )}
 
             <div className="flex flex-wrap gap-4">
-              {pageCars.map((car) => (
+              {cars.map((car) => (
                 <CarCard
                   key={car.id}
                   name={`${car.brand} ${car.model}`}
@@ -386,10 +389,10 @@ export const CarListPage: React.FC = () => {
                   year={car.year}
                   isAvailable={car.isAvailable}
                   fuelType={car.fuelType}
-                  photoUrl={car.photoUrl}
+                  imageUrl={car.imageUrl}
                   price={{
                     current: car.pricePerDay,
-                    original: car.pricePerDay + 20,
+                    original: car.pricePerDay,
                   }}
                   onRent={() => navigate(`/reservation/${car.id}`, { state: { car } })}
                 />
@@ -397,42 +400,21 @@ export const CarListPage: React.FC = () => {
             </div>
 
             {/* Pagination */}
-            {total > 0 && (
+            {cars.length > 0 && (
               <div className="flex items-center justify-center gap-2 mt-8">
                 <button
                   type="button"
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  disabled={page === 1}
+                  disabled={!canPrev}
                   className="px-3 h-[30px] text-xs font-bold rounded border border-slate-900 disabled:opacity-40"
                 >
                   Prev
                 </button>
 
-                {Array.from({ length: totalPages }).slice(0, 12).map((_, idx) => {
-                  const p = idx + 1;
-                  const active = p === page;
-                  return (
-                    <button
-                      key={p}
-                      type="button"
-                      onClick={() => setPage(p)}
-                      className={
-                        active
-                          ? "px-3 h-[30px] text-xs font-bold rounded bg-slate-900 text-white"
-                          : "px-3 h-[30px] text-xs font-bold rounded border border-slate-900"
-                      }
-                    >
-                      {p}
-                    </button>
-                  );
-                })}
-
-                {totalPages > 12 && <span className="text-xs font-bold px-2">…</span>}
-
                 <button
                   type="button"
-                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                  disabled={page === totalPages}
+                  onClick={() => setPage((p) => p + 1)}
+                  disabled={!canNext}
                   className="px-3 h-[30px] text-xs font-bold rounded border border-slate-900 disabled:opacity-40"
                 >
                   Next

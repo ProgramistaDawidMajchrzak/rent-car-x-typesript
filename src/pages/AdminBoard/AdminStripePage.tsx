@@ -9,8 +9,7 @@ export const AdminStripePage: React.FC = () => {
   const [isSyncing, setIsSyncing] = useState(false);
 
   const extractDetails = (e: unknown) => {
-    // toApiError zwykle zwraca Error(message).
-    // Spróbujmy wyciągnąć więcej jeśli ktoś rzucił obiekt.
+
     if (e instanceof Error) return e.message;
 
     try {
@@ -28,7 +27,6 @@ export const AdminStripePage: React.FC = () => {
 
     try {
       const res = await syncProducts();
-      // API może zwracać void/OK, albo jakiś obiekt -> pokażmy to przy okazji
       setSuccess(res ? `Synced successfully: ${typeof res === "string" ? res : "OK"}` : "Synced successfully (OK).");
     } catch (e) {
       const msg = extractDetails(e);
@@ -83,10 +81,7 @@ export const AdminStripePage: React.FC = () => {
               </div>
             )}
 
-            <div className="mt-6 text-[11px] text-slate-500">
-              If you see “Invalid API Key provided”, set real Stripe <code>sk_test_...</code> / <code>pk_test_...</code> keys
-              in backend env and restart containers.
-            </div>
+      
           </div>
         </div>
       </div>

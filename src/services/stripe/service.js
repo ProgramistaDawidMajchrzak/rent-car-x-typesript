@@ -10,6 +10,7 @@ export const syncProducts = async () => {
   }
 };
 
+
 export const postWebhook = async (body, headers = {}) => {
   try {
     const res = await request.post("/stripe/webhook", body, { headers });

@@ -5,9 +5,9 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 
-// ✅ poprawne importy pod Twoją strukturę
 import { createReservation } from "../../services/reservations/service";
 import { getCarById } from "../../services/cars/service";
+import request from "../../services/request";
 
 type Car = {
   id: string;
@@ -17,12 +17,12 @@ type Car = {
   fuelType: string;
   pricePerDay: number;
   isAvailable: boolean;
-  photoUrl?: string | null;
+  imageUrl?: string | null;
 };
 
 type FormValues = {
-  startDate: string; // YYYY-MM-DD
-  endDate: string;   // YYYY-MM-DD
+  startDate: string;
+  endDate: string;
 };
 
 const schema = yup.object().shape({
@@ -53,9 +53,7 @@ function todayISO() {
   return `${yyyy}-${mm}-${dd}`;
 }
 
-// ✅ backend chce ISO datetime, a input daje YYYY-MM-DD
 function dateToIso(dateYYYYMMDD: string) {
-  // UTC midnight (bez offsetów lokalnych)
   return new Date(`${dateYYYYMMDD}T00:00:00.000Z`).toISOString();
 }
 
@@ -68,17 +66,17 @@ function mapCarDetailsToCar(raw: any): Car {
     fuelType: raw.fuelType ?? raw.FuelType ?? "",
     pricePerDay: raw.pricePerDay ?? raw.PricePerDay ?? 0,
     isAvailable: Boolean(raw.isAvailable ?? raw.IsAvailable ?? raw.available ?? raw.Available),
-    photoUrl: raw.photoUrl ?? raw.PhotoUrl ?? raw.imageUrl ?? raw.ImageUrl ?? raw.photo ?? null,
+    imageUrl: raw.imageUrl ?? raw.ImageUrl ?? raw.photoUrl ?? raw.PhotoUrl ?? null,
   };
 }
 
-function resolvePhotoUrl(photoUrl?: string | null) {
-  if (!photoUrl) return null;
-  if (photoUrl.startsWith("http://") || photoUrl.startsWith("https://")) return photoUrl;
 
-  // ✅ tu ustaw swój backend base url
-  // jeśli masz request baseURL = http://localhost:8080/api/v1, to zdjęcia zwykle są z hosta backendu
-  return `http://localhost:8080${photoUrl}`;
+function resolveImageUrl(imageUrl?: string | null) {
+  if (!imageUrl) return null;
+  if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) return imageUrl;
+
+  const origin = request.defaults.baseURL?.replace(/\/api\/v1\/?$/, "");
+  return origin ? `${origin}${imageUrl}` : imageUrl;
 }
 
 export const ReservationPage: React.FC = () => {
@@ -119,24 +117,30 @@ export const ReservationPage: React.FC = () => {
   const pricePerDay = car?.pricePerDay ?? 0;
   const total = useMemo(() => days * pricePerDay, [days, pricePerDay]);
 
-  useEffect(() => {
-    if (!carId) return;
 
-    // jeśli car przyszedł w state, nie musisz robić requestu (ale możemy dociągnąć szczegóły)
-    setLoadingCar(true);
-    setCarError("");
+useEffect(() => {
+  if (!carId) return;
 
-    getCarById(carId)
-      .then((data) => {
-        const mapped = mapCarDetailsToCar(data);
-        setCar((prev) => {
-          const photoUrl = mapped.photoUrl ?? prev?.photoUrl ?? null;
-          return { ...(prev ?? mapped), ...mapped, photoUrl };
-        });
-      })
-      .catch((e) => setCarError(e instanceof Error ? e.message : "Failed to load car."))
-      .finally(() => setLoadingCar(false));
-  }, [carId]);
+  setLoadingCar(true);
+  setCarError("");
+
+  getCarById(carId)
+    .then((data) => {
+      const mapped = mapCarDetailsToCar(data);
+
+      setCar((prev) => {
+        const imageUrl = mapped.imageUrl ?? prev?.imageUrl ?? null;
+
+        return {
+          ...(prev ?? mapped),
+          ...mapped,     
+          imageUrl,        
+        };
+      });
+    })
+    .catch((e) => setCarError(e instanceof Error ? e.message : "Failed to load car."))
+    .finally(() => setLoadingCar(false));
+}, [carId]);
 
   const onSubmit = async (data: FormValues) => {
     if (!carId) return;
@@ -145,7 +149,6 @@ export const ReservationPage: React.FC = () => {
     setOk("");
 
     try {
-      // ✅ swagger: startDate/endDate jako ISO datetime
       const payload = {
         carId,
         startDate: dateToIso(data.startDate),
@@ -172,7 +175,7 @@ export const ReservationPage: React.FC = () => {
     );
   }
 
-  const imgSrc = resolvePhotoUrl(car?.photoUrl);
+  const imgSrc = resolveImageUrl(car?.imageUrl);
 
   return (
     <Layout>

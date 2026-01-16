@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { confirmEmail } from "../../services/auth/service";
 import { Image } from "../../components/Image";
 
 export const EmailConfirmationPage: React.FC = () => {
   const [params] = useSearchParams();
+  const navigate = useNavigate();
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
 
   const userId = params.get("userId");
@@ -48,11 +49,10 @@ export const EmailConfirmationPage: React.FC = () => {
                 Your email has been successfully verified. You may now log in.
               </p>
 
-              <a href="/login">
-                <div className="flex items-center justify-center px-4 text-xs font-bold rounded border cursor-pointer border-slate-900 h-[30px] w-[160px] text-slate-900">
+                <div onClick={() => navigate("/login")} className="flex items-center justify-center px-4 text-xs font-bold rounded border cursor-pointer border-slate-900 h-[30px] w-[160px] text-slate-900">
                   Log In
                 </div>
-              </a>
+              
             </>
           )}
 

@@ -10,9 +10,7 @@ function useQuery() {
 export const PaymentSuccessPage: React.FC = () => {
   const q = useQuery();
 
-  // Stripe często dodaje: ?session_id=cs_test_...
   const sessionId = q.get("session_id") || q.get("sessionId");
-  // jeśli backend/frontend dokłada własne parametry:
   const reservationId = q.get("reservationId") || q.get("reservation_id");
   const amount = q.get("amount");
   const currency = q.get("currency");

@@ -72,7 +72,7 @@ const copy = async (txt: string) => {
   try {
     await navigator.clipboard.writeText(txt);
   } catch {
-    // fallback
+
     const el = document.createElement("textarea");
     el.value = txt;
     document.body.appendChild(el);
@@ -123,7 +123,6 @@ export const Board: React.FC = () => {
     error: "",
   });
 
-  // te 3 zostawiamy jako "liczniki/tekst", dopóki nie podasz modeli odpowiedzi
   const [carsStatuses, setCarsStatuses] = useState<LoadState<any>>({
     data: null,
     loading: true,
@@ -213,7 +212,7 @@ export const Board: React.FC = () => {
   return (
     <AdminLayout title="Dashboard">
       <div className="p-10">
-        {/* Header */}
+  
         <div className="flex items-center justify-between gap-3 mb-6">
           <div>
             <div className="text-xl font-bold text-[#02193D]">System overview</div>
@@ -228,7 +227,7 @@ export const Board: React.FC = () => {
           </button>
         </div>
 
-        {/* KPI cards */}
+     
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4">
           <Card
             title="Unavailable cars"
@@ -246,34 +245,11 @@ export const Board: React.FC = () => {
             error={pending.error}
           />
 
-          <Card
-            title="Cars statuses"
-            value={carsStatuses.loading ? "…" : "Loaded"}
-            subtitle="(Define response DTO to show breakdown)"
-            loading={carsStatuses.loading}
-            error={carsStatuses.error}
-          />
-
-          <Card
-            title="Deadline today"
-            value={deadlineToday.loading ? "…" : "Loaded"}
-            subtitle="(Define response DTO to show count)"
-            loading={deadlineToday.loading}
-            error={deadlineToday.error}
-          />
-
-          <Card
-            title="System locked IDs"
-            value={systemLocks.loading ? "…" : "Loaded"}
-            subtitle="(Define response DTO to show list/count)"
-            loading={systemLocks.loading}
-            error={systemLocks.error}
-          />
+    
         </div>
 
-        {/* Tables */}
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mt-8">
-          {/* Pending reservations */}
+
           <div className="border border-slate-200 rounded-lg overflow-hidden bg-white">
             <div className="bg-[#02193D] text-white px-4 py-2 text-xs font-bold">
               Pending reservations
@@ -383,13 +359,7 @@ export const Board: React.FC = () => {
                               Copy ID
                             </button>
 
-                            {/* jeśli masz routy adminowe, możesz to podpiąć */}
-                            {/* <a
-                              href={`/admin/reservations/${r.id}`}
-                              className="px-2 py-1 text-[11px] rounded bg-[#02193D] text-white hover:opacity-90"
-                            >
-                              Open
-                            </a> */}
+                       
                           </div>
                         </td>
                       </tr>
@@ -405,7 +375,7 @@ export const Board: React.FC = () => {
             )}
           </div>
 
-          {/* Unavailable cars */}
+     
           <div className="border border-slate-200 rounded-lg overflow-hidden bg-white">
             <div className="bg-[#02193D] text-white px-4 py-2 text-xs font-bold">
               Unavailable cars

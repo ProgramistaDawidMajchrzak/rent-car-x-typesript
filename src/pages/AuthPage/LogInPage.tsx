@@ -56,6 +56,9 @@ export const LogInPage: React.FC = () => {
           <div className="mx-auto w-full max-w-[320px]">
 
             <div className="mb-4 text-2xl font-bold">Log In</div>
+            <span className='text-xs'>admin@rentcarx.com</span>
+            <br />
+            <span className='text-xs'>UmVudGNhcnhhZG1pbnBhc3N3b3JkdmVyeXN0cm9uZwo=</span>
 
             <div className="flex flex-col gap-4 mb-6">
 

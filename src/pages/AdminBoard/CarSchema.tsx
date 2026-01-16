@@ -18,7 +18,6 @@ const schema = yup.object({
   isAvailable: yup.boolean().required(),
 });
 
-// Finalny typ formularza:
 export type CarFormData = {
   brand: string;
   model: string;
@@ -26,7 +25,7 @@ export type CarFormData = {
   fuelType: string;
   pricePerDay: number;
   isAvailable: boolean;
-  photo?: FileList; // tylko w TS, yup tego nie waliduje
+  photo?: FileList;
 };
 
 export default schema;
